@@ -1,0 +1,73 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Choropleth of Malaysia states - share of population aged 60+ (2020).",
+  "title": {
+    "text": "Malaysia: Share of Population Aged 60+ (2020)",
+    "fontSize": 18,
+    "fontWeight": "bold",
+    "anchor": "start",
+    "color": "#2c3e50"
+  },
+  "width": 700,
+  "height": 420,
+  "background": "#cfeeff",
+  "layer": [
+    {
+      "name": "graticule",
+      "data": {"graticule": true},
+      "mark": {"type": "geoshape", "stroke": "#b8d0e6", "strokeWidth": 0.6, "fill": null},
+      "projection": {"type": "mercator", "center": [109, 4], "scale": 1200}
+    },
+    {
+      "name": "states",
+      "data": {
+        "url": "https://raw.githubusercontent.com/jnewbery/CartogramMalaysia/9ac25c828e0306dfa2c2869f98eb2b357da69764/public/data/malaysia-states.topojson",
+        "format": {"type": "topojson", "feature": "states"}
+      },
+      "transform": [
+        {
+          "lookup": "properties.Name",
+          "from": {
+            "data": {
+              "url": "https://raw.githubusercontent.com/ShiyiNinini/FIT3179_homework9/refs/heads/main/population_60plus_aligned.csv",
+              "format": {"type": "csv"}
+            },
+            "key": "state",
+            "fields": ["total_population","age60plus_population","share_60plus"]
+          },
+          "as": ["total_population","age60plus_population","share_60plus"]
+        }
+      ],
+      "mark": {"type": "geoshape", "stroke": "#666666", "strokeWidth": 0.6},
+      "encoding": {
+        "color": {
+          "field": "share_60plus",
+          "type": "quantitative",
+          "title": "Population Aged 60+ (%)",
+          "scale": {
+            "domain": [8, 13],
+            "range": ["#ffffbf", "#fee08b", "#fdae61", "#f46d43", "#d73027", "#a50026"]
+          },
+          "legend": {
+            "orient": "right",
+            "titleLimit": 180,
+            "symbolType": "square",
+            "titleFontSize": 12,
+            "labelFontSize": 10
+          }
+        },
+        "tooltip": [
+          {"field": "properties.Name", "title": "State"},
+          {"field": "share_60plus", "title": "60+ Population (%)", "format": ".1f"},
+          {"field": "age60plus_population", "title": "60+ Population (000s)", "format": ","},
+          {"field": "total_population", "title": "Total Population (000s)", "format": ","}
+        ]
+      },
+      "projection": {"type": "mercator", "center": [109, 4], "scale": 1200}
+    }
+  ],
+  "config": {
+    "view": {"stroke": "transparent"}, 
+    "axis": {"domain": false}
+    }
+}
