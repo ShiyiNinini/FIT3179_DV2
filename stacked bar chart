@@ -1,0 +1,91 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {"url": "https://raw.githubusercontent.com/ShiyiNinini/FIT3179_homework9/refs/heads/main/population_state.csv"},
+  "params": [
+    {
+      "name": "sex_selection",
+      "value": "both",
+      "bind": {
+        "input": "select",
+        "options": ["male", "female", "both"],
+        "labels": ["Male", "Female", "Both"],
+        "name": "Select Gender: "
+      }
+    }
+  ],
+  "layer": [
+    {
+      "transform": [
+        {"filter": "datum.date == '2022-01-01'"},
+        {"filter": "datum.sex == sex_selection"},
+        {"filter": "datum.age == 'overall'"},
+        {"filter": "datum.ethnicity != 'overall'"}
+      ],
+      "mark": {"type": "bar"},
+      "encoding": {
+        "x": {
+          "field": "state", 
+          "type": "nominal", 
+          "title": "State",
+          "sort": null
+          },
+        "y": {
+          "field": "population",
+          "type": "quantitative",
+          "title": "Population (thousands)"
+        },
+        "color": {"field": "ethnicity", "type": "nominal", "title": "Ethnicity"},
+        "tooltip": [
+          {"field": "state", "type": "nominal"},
+          {"field": "ethnicity", "type": "nominal"},
+          {"field": "population", "type": "quantitative", "title": "Population (thousands)"}
+        ]
+      }
+    },
+    {
+      "transform": [
+        {"filter": "datum.date == '2022-01-01'"},
+        {"filter": "datum.sex == sex_selection"},
+        {"filter": "datum.age == 'overall'"},
+        {"filter": "datum.ethnicity != 'overall'"},
+        {
+          "aggregate": [{"op": "sum", "field": "population", "as": "state_total"}],
+          "groupby": ["state"]
+        },
+        {
+          "window": [{"op": "rank", "as": "rank"}],
+          "sort": [{"field": "state_total", "order": "descending"}]
+        },
+        {"filter": "datum.rank == 1"}
+      ],
+      "mark": {
+        "type": "text",
+        "align": "center",
+        "dx" : -12 ,
+        "fontSize": 11.5,
+        "fontWeight": "bold",
+        "color": "black"
+      },
+      "encoding": {
+        "x": {
+          "field": "state", 
+          "type": "nominal", 
+          "sort": null
+          },
+        "y": {"field": "state_total", "type": "quantitative"},
+        "text": {"value": "Highest Population"}
+      }
+    }
+  ],
+  "title": {
+    "text": "Population by State and Ethnicity (2022)",
+    "subtitle": "Interactive stacked bar chart filtered by gender",
+    "anchor": "start",
+    "fontSize": 16,
+    "color": "#333"
+  },
+  "config": {
+    "view": {"stroke": "transparent"},
+    "axis": {"labelFontSize": 12, "titleFontSize": 14}
+  }
+}
