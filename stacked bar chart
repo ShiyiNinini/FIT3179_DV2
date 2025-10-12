@@ -11,15 +11,27 @@
         "labels": ["Male", "Female", "Both"],
         "name": "Select Gender: "
       }
+    },
+    {
+      "name": "year",
+      "value": 2020,
+      "bind": {
+        "input": "range",
+        "min": 2015,
+        "max": 2022,
+        "step": 1,
+        "name": "Select Year: "
+      }
     }
   ],
   "layer": [
     {
       "transform": [
-        {"filter": "datum.date == '2022-01-01'"},
         {"filter": "datum.sex == sex_selection"},
         {"filter": "datum.age == 'overall'"},
-        {"filter": "datum.ethnicity != 'overall'"}
+        {"filter": "datum.ethnicity != 'overall'"},
+        {"calculate": "year(datum.date)", "as": "year"},
+        {"filter": "datum.year == year"}
       ],
       "mark": {"type": "bar"},
       "encoding": {
@@ -44,10 +56,11 @@
     },
     {
       "transform": [
-        {"filter": "datum.date == '2022-01-01'"},
         {"filter": "datum.sex == sex_selection"},
         {"filter": "datum.age == 'overall'"},
         {"filter": "datum.ethnicity != 'overall'"},
+        {"calculate": "year(datum.date)", "as": "year"},
+        {"filter": "datum.year == year"},
         {
           "aggregate": [{"op": "sum", "field": "population", "as": "state_total"}],
           "groupby": ["state"]
@@ -78,7 +91,7 @@
     }
   ],
   "title": {
-    "text": "Population by State and Ethnicity (2022)",
+    "text": "Population by State and Ethnicity",
     "subtitle": "Interactive stacked bar chart filtered by gender",
     "anchor": "start",
     "fontSize": 16,
