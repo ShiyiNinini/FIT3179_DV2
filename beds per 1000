@@ -1,0 +1,89 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Malaysia: Hospital Beds per 1,000 People (2015-2022)",
+  "title": {
+    "text": "Malaysia: Hospital Beds per 1,000 People (2015-2022)",
+    "fontSize": 18,
+    "fontWeight": "bold",
+    "anchor": "start",
+    "color": "#2c3e50"
+  },
+  "width": 700,
+  "height": 420,
+  "background": "#cfeeff",
+  "params": [
+    {
+      "name": "yearSelector",
+      "value": 2020,
+      "bind": {"input": "range", "min": 2015, "max": 2022, "step": 1}
+    }
+  ],
+  "layer": [
+    {
+      "name": "graticule",
+      "data": {"graticule": true},
+      "mark": {"type": "geoshape", "stroke": "#b8d0e6", "strokeWidth": 0.6, "fill": null},
+      "projection": {"type": "mercator", "center": [109, 4], "scale": 1200}
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/jnewbery/CartogramMalaysia/9ac25c828e0306dfa2c2869f98eb2b357da69764/public/data/malaysia-states.topojson",
+        "format": {"type": "topojson", "feature": "states"}
+      },
+      "mark": {"type": "geoshape", "fill": "#eeeeee", "stroke": "#ffffff", "strokeWidth": 0.6},
+      "projection": {"type": "mercator", "center": [109, 4], "scale": 1200}
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/ShiyiNinini/FIT3179_DV2/refs/heads/main/merged_population_hospital_final.csv",
+        "format": {"type": "csv"}
+      },
+      "transform": [
+        {"calculate": "year(toDate(datum.date))", "as": "year"},
+        {"filter": "datum.sex == 'both' && datum.age == 'overall' && datum.type == 'all' && datum.ethnicity == 'overall'"},
+        {"filter": "datum.year == yearSelector"},
+        {"calculate": "toNumber(datum.beds)", "as": "beds_num"},
+        {"calculate": "toNumber(datum.population) * 1000", "as": "pop_num"},
+        {"calculate": "(datum.beds_num / datum.pop_num) * 1000", "as": "beds_per_1000"},
+        {
+          "lookup": "state",
+          "from": {
+            "data": {
+              "url": "https://raw.githubusercontent.com/jnewbery/CartogramMalaysia/9ac25c828e0306dfa2c2869f98eb2b357da69764/public/data/malaysia-states.topojson",
+              "format": {"type": "topojson", "feature": "states"}
+            },
+            "key": "properties.Name",
+            "fields": ["type", "properties", "geometry"]
+          }
+        }
+      ],
+      "mark": {"type": "geoshape", "stroke": "#666666", "strokeWidth": 0.6},
+      "encoding": {
+        "color": {
+          "field": "beds_per_1000",
+          "type": "quantitative",
+          "title": "Beds per 1,000 People",
+          "scale": {
+            "domain": [0, 3],
+            "range": ["#ffffbf", "#fee08b", "#fdae61", "#f46d43", "#d73027", "#a50026"]
+          },
+          "legend": {
+            "orient": "right",
+            "titleLimit": 180,
+            "symbolType": "square",
+            "titleFontSize": 12,
+            "labelFontSize": 10
+          }
+        },
+        "tooltip": [
+          {"field": "state", "title": "State"},
+          {"field": "beds_num", "title": "Total Beds", "format": ","},
+          {"field": "pop_num", "title": "Population", "format": ","},
+          {"field": "beds_per_1000", "title": "Beds per 1,000", "format": ".2f"}
+        ]
+      },
+      "projection": {"type": "mercator", "center": [109, 4], "scale": 1200}
+    }
+  ],
+  "config": {"view": {"stroke": "transparent"}, "axis": {"domain": false}}
+}
