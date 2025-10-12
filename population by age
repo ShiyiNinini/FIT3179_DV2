@@ -1,0 +1,88 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Malaysia: Population by Age Group and State",
+  "title": {
+    "text": "Malaysia: Population Distribution by Age Group (2015-2022)",
+    "fontSize": 18,
+    "fontWeight": "bold",
+    "anchor": "start",
+    "color": "#2c3e50"
+  },
+  "width": 700,
+  "height": 500,
+  "background": "#f9f9f9",
+  "params": [
+    {
+      "name": "yearSelector",
+      "value": 2020,
+      "bind": {"input": "range", "min": 2015, "max": 2022, "step": 1, "name": "Year: "}
+    },
+    {
+      "name": "ageGroupSelect",
+      "select": {"type": "point", "fields": ["age_category"]},
+      "bind": "legend"
+    }
+  ],
+  "data": {
+    "url": "https://raw.githubusercontent.com/ShiyiNinini/FIT3179_homework9/refs/heads/main/population_state.csv",
+    "format": {"type": "csv"}
+  },
+  "transform": [
+    {"calculate": "year(toDate(datum.date))", "as": "year"},
+    {"filter": "datum.sex == 'both' && datum.ethnicity == 'overall'"},
+    {"filter": "datum.age != 'overall'"},
+    {"filter": "datum.year == yearSelector"},
+    {"calculate": "toNumber(datum.population) * 1000", "as": "pop_num"},
+    {
+      "calculate": "datum.age == '0-4' || datum.age == '5-9' || datum.age == '10-14' ? 'Children (0-14)' : datum.age == '15-19' || datum.age == '20-24' || datum.age == '25-29' || datum.age == '30-34' || datum.age == '35-39' ? 'Young Adults (15-39)' : datum.age == '40-44' || datum.age == '45-49' || datum.age == '50-54' || datum.age == '55-59' ? 'Middle Aged (40-59)' : 'Seniors (60+)'",
+      "as": "age_category"
+    },
+    {
+      "aggregate": [{"op": "sum", "field": "pop_num", "as": "total_population"}],
+      "groupby": ["state", "age_category"]
+    }
+  ],
+  "mark": {"type": "bar"},
+  "encoding": {
+    "x": {
+      "field": "total_population",
+      "type": "quantitative",
+      "title": "Population",
+      "axis": {"format": "~s", "labelFontSize": 11}
+    },
+    "y": {
+      "field": "state",
+      "type": "nominal",
+      "title": "State",
+      "sort": "-x",
+      "axis": {"labelFontSize": 11}
+    },
+    "color": {
+      "field": "age_category",
+      "type": "nominal",
+      "title": "Age Group (Click to Filter)",
+      "scale": {
+        "domain": ["Children (0-14)", "Young Adults (15-39)", "Middle Aged (40-59)", "Seniors (60+)"],
+        "range": ["#fdae61", "#abd9e9", "#2c7bb6", "#d7191c"]
+      },
+      "legend": {
+        "titleFontSize": 12,
+        "labelFontSize": 11,
+        "symbolSize": 150
+      }
+    },
+    "opacity": {
+      "condition": {"param": "ageGroupSelect", "value": 1},
+      "value": 0.2
+    },
+    "tooltip": [
+      {"field": "state", "title": "State"},
+      {"field": "age_category", "title": "Age Group"},
+      {"field": "total_population", "title": "Population", "format": ","}
+    ]
+  },
+  "config": {
+    "view": {"stroke": "transparent"},
+    "axis": {"grid": false}
+  }
+}
