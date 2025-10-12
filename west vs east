@@ -1,0 +1,146 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Malaysia: Population and Hospital Beds Trend by Region",
+  "title": {
+    "text": "Malaysia: Population and Hospital Beds Trend - East vs West Malaysia (2015-2022)",
+    "fontSize": 18,
+    "fontWeight": "bold",
+    "anchor": "start",
+    "color": "#2c3e50"
+  },
+  "width": 700,
+  "height": 400,
+  "background": "#f9f9f9",
+  "data": {
+    "url": "https://raw.githubusercontent.com/ShiyiNinini/FIT3179_DV2/refs/heads/main/merged_population_hospital_final.csv",
+    "format": {"type": "csv"}
+  },
+  "transform": [
+    {"calculate": "year(toDate(datum.date))", "as": "year"},
+    {"filter": "datum.sex == 'both' && datum.age == 'overall' && datum.ethnicity == 'overall' && datum.type == 'all'"},
+    {"calculate": "toNumber(datum.population) * 1000", "as": "pop_num"},
+    {"calculate": "toNumber(datum.beds)", "as": "beds_num"},
+    {
+      "calculate": "datum.state == 'Sabah' || datum.state == 'Sarawak' || datum.state == 'Labuan' ? 'East Malaysia' : 'West Malaysia'",
+      "as": "region"
+    },
+    {
+      "aggregate": [
+        {"op": "sum", "field": "pop_num", "as": "total_population"},
+        {"op": "sum", "field": "beds_num", "as": "total_beds"}
+      ],
+      "groupby": ["year", "region"]
+    },
+    {"calculate": "datum.total_beds / 1000", "as": "beds_in_thousands"}
+  ],
+  "encoding": {
+    "x": {
+      "field": "year",
+      "type": "ordinal",
+      "title": "Year",
+      "axis": {"labelAngle": 0, "labelFontSize": 11}
+    }
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "line",
+        "point": {"filled": true, "size": 80},
+        "strokeWidth": 3
+      },
+      "encoding": {
+        "y": {
+          "field": "total_population",
+          "type": "quantitative",
+          "title": "Population",
+          "axis": {
+            "titleColor": "#1f77b4",
+            "labelColor": "#1f77b4",
+            "format": "~s",
+            "labelFontSize": 11,
+            "titleFontSize": 12,
+            "titlePadding": 10
+          }
+        },
+        "color": {
+          "field": "region",
+          "type": "nominal",
+          "scale": {
+            "domain": ["West Malaysia", "East Malaysia"],
+            "range": ["#1f77b4", "#17becf"]
+          },
+          "legend": {
+            "title": "Region - Population",
+            "orient": "top-right",
+            "offset": 10
+          }
+        },
+        "strokeDash": {
+          "field": "region",
+          "type": "nominal",
+          "scale": {
+            "domain": ["West Malaysia", "East Malaysia"],
+            "range": [[1, 0], [5, 5]]
+          },
+          "legend": null
+        },
+        "tooltip": [
+          {"field": "year", "title": "Year"},
+          {"field": "region", "title": "Region"},
+          {"field": "total_population", "title": "Population", "format": ","}
+        ]
+      }
+    },
+    {
+      "mark": {
+        "type": "line",
+        "point": {"filled": true, "size": 80},
+        "strokeWidth": 3
+      },
+      "encoding": {
+        "y": {
+          "field": "beds_in_thousands",
+          "type": "quantitative",
+          "title": "Hospital Beds (thousands)",
+          "axis": {
+            "titleColor": "#d62728",
+            "labelColor": "#d62728",
+            "format": ".1f",
+            "labelFontSize": 11,
+            "titleFontSize": 12,
+            "titlePadding": 10,
+            "orient": "right"
+          },
+          "scale": {"domain": [0, 45]}
+        },
+        "color": {
+          "field": "region",
+          "type": "nominal",
+          "scale": {
+            "domain": ["West Malaysia", "East Malaysia"],
+            "range": ["#d62728", "#ff7f0e"]
+          }
+        },
+        "strokeDash": {
+          "field": "region",
+          "type": "nominal",
+          "scale": {
+            "domain": ["West Malaysia", "East Malaysia"],
+            "range": [[1, 0], [5, 5]]
+          },
+          "legend": null
+        },
+        "tooltip": [
+          {"field": "year", "title": "Year"},
+          {"field": "region", "title": "Region"},
+          {"field": "total_beds", "title": "Hospital Beds", "format": ","}
+        ]
+      }
+    }
+  ],
+  "resolve": {"scale": {"y": "independent"}},
+  "config": {
+    "view": {"stroke": "transparent"},
+    "axis": {"grid": true, "gridOpacity": 0.2}
+  }
+}
