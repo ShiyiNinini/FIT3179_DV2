@@ -1,0 +1,72 @@
+{
+  "$schema" : "https://vega.github.io/schema/vega-lite/v5.json",
+  "width" : 500 ,
+  "height" : 400 ,
+  "title": "Beds Vs Population",
+  "data":{
+    "url": "https://raw.githubusercontent.com/ShiyiNinini/FIT3179_DV2/refs/heads/main/merged_population_hospital_aligned.csv"
+  },
+  "params": [
+    {
+      "name": "year",
+      "value": 2020,
+      "bind": {
+        "input": "range",
+        "min": 2015,
+        "max": 2022,
+        "step": 1,
+        "name": "Select Year: "
+      }
+    }
+  ],
+  "transform": [
+    {
+      "filter": "datum.age == 'overall' && datum.ethnicity == 'overall' && datum.type == 'all' && datum.sex == 'both'"
+    },
+    {"calculate": "year(datum.date)", "as": "year"},
+    {"filter": "datum.year == year"}
+  ],
+  "mark": "circle",
+  "encoding": {
+    "x": {
+      "field": "population",
+      "type": "quantitative",
+      "title": "Population"
+    },
+    "y": {
+      "field": "beds",
+      "type": "quantitative",
+      "title": "Number of Beds"
+    },
+    "size": {
+      "field": "population",
+      "type": "quantitative",
+      "title": "Population (bubble size)",
+      "scale": {
+        "range": [50, 2000]
+      }
+    },
+    "color": {
+      "field": "state",
+      "type": "nominal",
+      "scale": {
+        "domain": [
+          "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan", "Pahang",
+          "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak", "Selangor",
+          "Terengganu", "Kuala Lumpur", "Labuan", "Putrajaya"
+        ],
+        "range": [
+          "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b",
+          "#e377c2", "#7f7f7f", "#bcbd22", "#17becf", "#fdae61", "#66c2a5",
+          "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854"
+        ]
+      }
+    },
+    "tooltip": [
+      { "field": "state", "type": "nominal", "title": "State" },
+      {"field": "year", "type": "quantitative", "title": "Year"},
+      { "field": "population", "type": "quantitative", "title": "Population" },
+      { "field": "beds", "type": "quantitative", "title": "Beds" }
+    ]
+  }
+}
