@@ -8,9 +8,10 @@
     "anchor": "start",
     "color": "#2c3e50"
   },
-  "width": 700,
-  "height": 420,
+  "width": "container",
+  "height": 340,
   "background": "#cfeeff",
+  "autosize": {"type": "fit", "contains": "padding"},
   "params": [
     {
       "name": "yearSelector",

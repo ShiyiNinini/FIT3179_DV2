@@ -24,6 +24,9 @@
       }
     }
   ],
+  "width": "container",
+  "height": 320,
+  "autosize": {"type": "fit", "contains": "padding"},
   "layer": [
     {
       "transform": [
