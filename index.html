@@ -22,9 +22,9 @@
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 16px;
+            padding: 20px;
         }
 
         .main-title {
@@ -57,16 +57,15 @@
         .two-columns {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 20px;
+            gap: 30px;
             align-items: start;
         }
 
         .chart-container {
             background: #f9f9f9;
             border-radius: 8px;
-            padding: 14px;
+            padding: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            width: 100%;
         }
 
         .text-content {
@@ -88,23 +87,32 @@
             color: #555;
         }
 
-        /* Three Equal Columns */
-        .three-columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 16px;
-            align-items: start;
+        /* Two Charts on Top, Text Below - Full Width */
+        .charts-text-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
         }
 
-        .three-columns .chart-container {
-            min-height: 500px;
+        .two-charts-horizontal {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .two-charts-horizontal .chart-container {
+            min-height: 400px;
+        }
+        
+        .full-width-text {
+            width: 100%;
         }
 
         /* Combined Columns */
         .combined-columns {
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
             align-items: start;
         }
 
@@ -114,23 +122,20 @@
             gap: 20px;
         }
 
-        /* Prevent overflow in grid children */
-        .two-columns,
-        .three-columns,
-        .combined-columns,
-        .combined-chart { min-width: 0; }
-
         .combined-chart .chart-container {
-            min-height: 400px;
+            min-height: 350px;
         }
 
         /* Responsive Design */
-        @media (max-width: 1150px) {
+        @media (max-width: 1200px) {
             .two-columns,
-            .three-columns,
             .combined-columns {
                 grid-template-columns: 1fr;
                 gap: 20px;
+            }
+            
+            .two-charts-horizontal {
+                grid-template-columns: 1fr;
             }
             
             .combined-chart {
@@ -151,9 +156,6 @@
                 margin-bottom: 30px;
             }
         }
-
-        /* Avoid horizontal scrollbar */
-        body { overflow-x: hidden; }
     </style>
 </head>
 <body>
@@ -176,20 +178,22 @@
             </div>
         </div>
 
-        <!-- Three Equal Columns -->
+        <!-- Two Charts on Top, Text Below -->
         <div class="section">
             <h2 class="section-title">Population Demographics Analysis</h2>
-            <div class="three-columns">
-                <div class="chart-container">
-                    <div id="population-by-age"></div>
+            <div class="charts-text-vertical">
+                <div class="two-charts-horizontal">
+                    <div class="chart-container">
+                        <div id="population-by-age"></div>
+                    </div>
+                    <div class="chart-container">
+                        <div id="stacked-bar-chart"></div>
+                    </div>
                 </div>
-                <div class="chart-container">
-                    <div id="stacked-bar-chart"></div>
-                </div>
-                <div class="text-content">
+                <div class="text-content full-width-text">
                     <h3>Demographic Insights</h3>
                     <p>The left chart shows population distribution by age groups across states, revealing which regions have younger or older populations. This is crucial for healthcare planning as different age groups have varying healthcare needs.</p>
-                    <p>The middle chart displays population by ethnicity and state, showing the diverse demographic composition of Malaysia. Understanding these patterns helps in planning culturally appropriate healthcare services.</p>
+                    <p>The right chart displays population by ethnicity and state, showing the diverse demographic composition of Malaysia. Understanding these patterns helps in planning culturally appropriate healthcare services.</p>
                 </div>
             </div>
         </div>
@@ -227,9 +231,8 @@
                 "anchor": "start",
                 "color": "#2c3e50"
             },
-            "width": "container",
-            "height": 340,
-            "autosize": {"type": "fit", "contains": "padding"},
+            "width": 600,
+            "height": 400,
             "background": "#cfeeff",
             "params": [
                 {
@@ -318,9 +321,8 @@
                 "anchor": "start",
                 "color": "#2c3e50"
             },
-            "width": "container",
-            "height": 320,
-            "autosize": {"type": "fit", "contains": "padding"},
+            "width": 350,
+            "height": 300,
             "background": "#f9f9f9",
             "params": [
                 {
@@ -424,9 +426,6 @@
                     }
                 }
             ],
-            "width": "container",
-            "height": 320,
-            "autosize": {"type": "fit", "contains": "padding"},
             "layer": [
                 {
                     "transform": [
@@ -507,8 +506,8 @@
                 "anchor": "start",
                 "color": "#333"
             },
-            "width": 400,
-            "height": 400,
+            "width": 350,
+            "height": 300,
             "config": {
                 "view": {"stroke": "transparent"},
                 "axis": {"labelFontSize": 9, "titleFontSize": 10}
@@ -525,9 +524,8 @@
                 "anchor": "start",
                 "color": "#2c3e50"
             },
-            "width": "container",
-            "height": 260,
-            "autosize": {"type": "fit", "contains": "padding"},
+            "width": 320,
+            "height": 280,
             "background": "#f9f9f9",
             "data": {
                 "url": "https://raw.githubusercontent.com/ShiyiNinini/FIT3179_DV2/refs/heads/main/merged_population_hospital_final.csv",
@@ -628,9 +626,8 @@
                 "anchor": "start",
                 "color": "#2c3e50"
             },
-            "width": "container",
-            "height": 260,
-            "autosize": {"type": "fit", "contains": "padding"},
+            "width": 320,
+            "height": 280,
             "background": "#f9f9f9",
             "data": {
                 "url": "https://raw.githubusercontent.com/ShiyiNinini/FIT3179_DV2/refs/heads/main/merged_population_hospital_final.csv",
@@ -770,8 +767,9 @@
         vegaEmbed('#beds-per-1000', bedsPer1000Spec);
         vegaEmbed('#population-by-age', populationByAgeSpec);
         vegaEmbed('#stacked-bar-chart', stackedBarSpec);
-        vegaEmbed('#total-trends', totalTrendsSpec);
-        vegaEmbed('#west-vs-east', westVsEastSpec);
+        vegaEmbed('#total-trends', totalTrendsSpec, {actions: false});
+        vegaEmbed('#west-vs-east', westVsEastSpec, {actions: false});
     </script>
 </body>
+</html>
 </html>
