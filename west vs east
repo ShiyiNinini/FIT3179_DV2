@@ -1,6 +1,6 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "description": "Malaysia: Population and Hospital Beds Trend by Region",
+  "description": "Malaysia: Population and Hospital Beds Trend by Region (Dual Y-Axis)",
   "title": {
     "text": "Malaysia: Population and Hospital Beds Trend - East vs West Malaysia (2015-2022)",
     "fontSize": 18,
@@ -8,8 +8,8 @@
     "anchor": "start",
     "color": "#2c3e50"
   },
-  "width": "container",
-  "height": 260,
+  "width": 650,
+  "height": 400,
   "background": "#f9f9f9",
   "autosize": {"type": "fit", "contains": "padding"},
   "data": {
@@ -18,7 +18,9 @@
   },
   "transform": [
     {"calculate": "year(toDate(datum.date))", "as": "year"},
-    {"filter": "datum.sex == 'both' && datum.age == 'overall' && datum.ethnicity == 'overall' && datum.type == 'all'"},
+    {
+      "filter": "datum.sex == 'both' && datum.age == 'overall' && datum.ethnicity == 'overall' && datum.type == 'all'"
+    },
     {"calculate": "toNumber(datum.population) * 1000", "as": "pop_num"},
     {"calculate": "toNumber(datum.beds)", "as": "beds_num"},
     {
@@ -32,7 +34,8 @@
       ],
       "groupby": ["year", "region"]
     },
-    {"calculate": "datum.total_beds / 1000", "as": "beds_in_thousands"}
+    {"calculate": "datum.total_population / 1000000", "as": "population_millions"},
+    {"calculate": "datum.total_beds / 1000", "as": "beds_thousands"}
   ],
   "encoding": {
     "x": {
@@ -40,107 +43,84 @@
       "type": "ordinal",
       "title": "Year",
       "axis": {"labelAngle": 0, "labelFontSize": 11}
+    },
+    "color": {
+      "field": "region",
+      "type": "nominal",
+      "title": "Region",
+      "scale": {
+        "domain": ["West Malaysia", "East Malaysia"],
+        "range": ["#1f77b4", "#ff7f0e"]
+      }
     }
   },
   "layer": [
     {
-      "mark": {
-        "type": "line",
-        "point": {"filled": true, "size": 80},
-        "strokeWidth": 3
-      },
+      "mark": {"type": "line", "point": {"filled": true, "size": 60}, "strokeWidth": 3},
       "encoding": {
         "y": {
-          "field": "total_population",
+          "field": "population_millions",
           "type": "quantitative",
-          "title": "Population",
+          "title": "Population (millions)",
           "axis": {
             "titleColor": "#1f77b4",
             "labelColor": "#1f77b4",
-            "format": "~s",
             "labelFontSize": 11,
-            "titleFontSize": 12,
-            "titlePadding": 10
+            "titleFontSize": 13,
+            "format": ".1f"
           }
         },
-        "color": {
-          "field": "region",
-          "type": "nominal",
-          "scale": {
-            "domain": ["West Malaysia", "East Malaysia"],
-            "range": ["#1f77b4", "#17becf"]
-          },
-          "legend": {
-            "title": "Region - Population",
-            "orient": "top-right",
-            "offset": 10
-          }
-        },
-        "strokeDash": {
-          "field": "region",
-          "type": "nominal",
-          "scale": {
-            "domain": ["West Malaysia", "East Malaysia"],
-            "range": [[1, 0], [5, 5]]
-          },
-          "legend": null
-        },
+        "strokeDash": {"value": [1, 0]},
         "tooltip": [
           {"field": "year", "title": "Year"},
           {"field": "region", "title": "Region"},
-          {"field": "total_population", "title": "Population", "format": ","}
+          {"field": "population_millions", "title": "Population (millions)", "format": ".2f"}
         ]
       }
     },
     {
-      "mark": {
-        "type": "line",
-        "point": {"filled": true, "size": 80},
-        "strokeWidth": 3
-      },
+      "mark": {"type": "line", "point": {"filled": true, "size": 60}, "strokeWidth": 3},
       "encoding": {
         "y": {
-          "field": "beds_in_thousands",
+          "field": "beds_thousands",
           "type": "quantitative",
           "title": "Hospital Beds (thousands)",
           "axis": {
+            "orient": "right",
             "titleColor": "#d62728",
             "labelColor": "#d62728",
-            "format": ".1f",
             "labelFontSize": 11,
-            "titleFontSize": 12,
-            "titlePadding": 10,
-            "orient": "right"
-          },
-          "scale": {"domain": [0, 45]}
+            "titleFontSize": 13,
+            "format": ".1f"
+          }
         },
+        "strokeDash": {"value": [5, 5]},
         "color": {
           "field": "region",
           "type": "nominal",
           "scale": {
             "domain": ["West Malaysia", "East Malaysia"],
-            "range": ["#d62728", "#ff7f0e"]
-          }
-        },
-        "strokeDash": {
-          "field": "region",
-          "type": "nominal",
-          "scale": {
-            "domain": ["West Malaysia", "East Malaysia"],
-            "range": [[1, 0], [5, 5]]
+            "range": ["#d62728", "#e377c2"]
           },
-          "legend": null
+          "legend": {"title": "Region (Beds)"}
         },
         "tooltip": [
           {"field": "year", "title": "Year"},
           {"field": "region", "title": "Region"},
-          {"field": "total_beds", "title": "Hospital Beds", "format": ","}
+          {"field": "beds_thousands", "title": "Hospital Beds (thousands)", "format": ".1f"}
         ]
       }
     }
   ],
   "resolve": {"scale": {"y": "independent"}},
   "config": {
+    "legend": {
+      "orient": "top",
+      "direction": "horizontal",
+      "padding": 10,
+      "labelFontSize": 12,
+      "titleFontSize": 13
+    },
     "view": {"stroke": "transparent"},
     "axis": {"grid": true, "gridOpacity": 0.2}
   }
