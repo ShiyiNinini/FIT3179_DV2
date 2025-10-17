@@ -1,0 +1,154 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Elderly Population vs Hospital Beds Correlation",
+  "title": {
+    "text": "Elderly Population vs Hospital Bed Availability by State",
+    "fontSize": 16,
+    "fontWeight": "bold",
+    "anchor": "start",
+    "color": "#2c3e50"
+  },
+  "width": 700,
+  "height": 500,
+  "background": "#f9f9f9",
+  "params": [
+    {
+      "name": "yearSelector",
+      "value": 2022,
+      "bind": {
+        "input": "range",
+        "min": 2015,
+        "max": 2022,
+        "step": 1,
+        "name": "Year: "
+      }
+    }
+  ],
+  "data": {
+    "url": "https://raw.githubusercontent.com/ShiyiNinini/FIT3179_DV2/refs/heads/main/merged_population_hospital_final.csv",
+    "format": {"type": "csv"}
+  },
+  "transform": [
+    {"calculate": "year(toDate(datum.date))", "as": "year"},
+    {"filter": "datum.year == yearSelector"},
+    {"filter": "datum.sex == 'both' && datum.ethnicity == 'overall' && datum.type == 'all'"},
+    {"calculate": "toNumber(datum.population)", "as": "pop_thousands"},
+    {"calculate": "toNumber(datum.beds)", "as": "beds_num"},
+    {
+      "calculate": "datum.state == 'Sabah' || datum.state == 'Sarawak' || datum.state == 'Labuan' ? 'East Malaysia' : 'West Malaysia'",
+      "as": "region"
+    },
+    {
+      "calculate": "datum.age == '60-64' || datum.age == '65-69' || datum.age == '70-74' || datum.age == '75-79' || datum.age == '80+' ? datum.pop_thousands : 0",
+      "as": "elderly_pop_calc"
+    },
+    {
+      "aggregate": [
+        {"op": "sum", "field": "pop_thousands", "as": "total_pop"},
+        {"op": "sum", "field": "elderly_pop_calc", "as": "elderly_pop"},
+        {"op": "max", "field": "beds_num", "as": "total_beds"}
+      ],
+      "groupby": ["state", "year", "region"]
+    },
+    {"calculate": "datum.total_pop", "as": "total_population"},
+    {"calculate": "datum.elderly_pop", "as": "elderly_population"},
+    {"calculate": "(datum.elderly_pop / datum.total_pop) * 100", "as": "elderly_percentage"},
+    {"calculate": "(datum.total_beds / datum.total_pop)", "as": "beds_per_1000"}
+  ],
+  "layer": [
+    {
+      "mark": {
+        "type": "circle",
+        "opacity": 0.8
+      },
+      "encoding": {
+        "x": {
+          "field": "elderly_percentage",
+          "type": "quantitative",
+          "title": "Elderly Population (60+ years, %)",
+          "axis": {"labelFontSize": 11, "titleFontSize": 12}
+        },
+        "y": {
+          "field": "beds_per_1000",
+          "type": "quantitative",
+          "title": "Hospital Beds per 1,000 People",
+          "axis": {"labelFontSize": 11, "titleFontSize": 12}
+        },
+        "size": {
+          "field": "total_population",
+          "type": "quantitative",
+          "title": "Total Population",
+          "scale": {"type": "sqrt", "range": [100, 1000]}
+        },
+        "color": {
+          "field": "region",
+          "type": "nominal",
+          "title": "Region",
+          "scale": {
+            "domain": ["West Malaysia", "East Malaysia"],
+            "range": ["#1f77b4", "#ff7f0e"]
+          },
+          "legend": {
+            "orient": "top-right",
+            "titleFontSize": 11,
+            "labelFontSize": 10
+          }
+        },
+        "tooltip": [
+          {"field": "state", "type": "nominal", "title": "State"},
+          {"field": "elderly_percentage", "type": "quantitative", "title": "Elderly %", "format": ".2f"},
+          {"field": "beds_per_1000", "type": "quantitative", "title": "Beds per 1,000", "format": ".2f"},
+          {"field": "total_population", "type": "quantitative", "title": "Total Population", "format": ".0f"},
+          {"field": "elderly_population", "type": "quantitative", "title": "Elderly Population", "format": ".0f"},
+          {"field": "total_beds", "type": "quantitative", "title": "Total Beds", "format": ".0f"}
+        ]
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "dx": 8,
+        "dy": -8,
+        "fontSize": 9,
+        "fontWeight": "bold"
+      },
+      "encoding": {
+        "x": {"field": "elderly_percentage", "type": "quantitative"},
+        "y": {"field": "beds_per_1000", "type": "quantitative"},
+        "text": {"field": "state", "type": "nominal"},
+        "color": {"value": "#333"},
+        "opacity": {
+          "condition": {
+            "test": "datum.state == 'Kuala Lumpur' || datum.state == 'Putrajaya' || datum.state == 'Perlis' || datum.state == 'Sabah' || datum.state == 'Sarawak'",
+            "value": 1
+          },
+          "value": 0
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "line",
+        "color": "#e74c3c",
+        "strokeWidth": 2,
+        "strokeDash": [5, 5]
+      },
+      "transform": [
+        {
+          "regression": "beds_per_1000",
+          "on": "elderly_percentage",
+          "method": "linear"
+        }
+      ],
+      "encoding": {
+        "x": {"field": "elderly_percentage", "type": "quantitative"},
+        "y": {"field": "beds_per_1000", "type": "quantitative"}
+      }
+    }
+  ],
+  "config": {
+    "view": {"stroke": "transparent"},
+    "axis": {"grid": true, "gridOpacity": 0.3}
+  }
+}
